@@ -1,0 +1,10 @@
+
+.Node {
+    
+    width: 20px;
+    height: 20px;
+    background-color: white;
+    outline: 1px solid #727272;
+    display: inline-block;
+    font-size: 0;
+}
