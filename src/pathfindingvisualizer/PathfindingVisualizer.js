@@ -2,8 +2,8 @@ import React from "react";
 import Node from "./Node";
 import "./PathfindingVisualizer.css";
 
-const GRID_ROW_LENGTH = 5;
-const GRID_COLUMN_LENGTH = 5;
+const GRID_ROW_LENGTH = 50;
+const GRID_COL_LENGTH = 6;
 
 // React uses JSX not plain javascript, first letter of tag indicates elements. 
 // Uppercase used to specify react components; ie cant camelCase.
@@ -21,9 +21,9 @@ export default class PathfindingVisualizer extends React.Component {
 
     resetGrid() {
         const grid = [];
-        for (let i = 0; i < GRID_ROW_LENGTH; i++) {
+        for (let i = 0; i < GRID_COL_LENGTH; i++) {
             let currentRow = [];
-            for (let j = 0; j < GRID_COLUMN_LENGTH; j++) {
+            for (let j = 0; j < GRID_ROW_LENGTH; j++) {
                 currentRow.push([]);
             }
             grid.push(currentRow);

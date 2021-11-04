@@ -1,5 +1,9 @@
 .grid-container{
     
-    /* text-align: center; */
+    height: 94vh; /* Magic here */
+    display: inline-block;
     font-size: 0;
+    margin: 200px 0 0;
+    white-space : nowrap; /* prevents divs from stacking if they dont fit on screen */
+    
 }
