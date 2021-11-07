@@ -15,3 +15,16 @@
 .endnode {
     background: red;
 }
+
+
+.node-visited {
+    background :aqua;
+}
+
+.node-path {
+    border-color: gold; 
+    box-sizing: border-box;
+    border: 5px solid gold;
+}
+
+

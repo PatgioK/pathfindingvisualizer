@@ -18,7 +18,7 @@ export default class Node extends Component {
         // if (startNode == false && endNode == false) extraClassName = " ";
         return <div
             className={`Node ${extraClassName}`}
-            id={`node-${this.props.row}-${this.props.col} ${extraClassName}`}
+            id={`node-${this.props.row}-${this.props.col}`}
             // row={this.props.row}
             // col={this.props.col}
 

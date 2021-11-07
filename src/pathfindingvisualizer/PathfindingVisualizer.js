@@ -2,16 +2,20 @@ import React from "react";
 import Node from "./Node";
 import "./PathfindingVisualizer.css";
 import { Dikjstras } from "./Algorithms/Dikjstras";
+import { setTimeout} from 'timers';
 
-const GRID_ROW_LENGTH = 15;
-const GRID_COL_LENGTH = 6;
+const GRID_ROW_LENGTH = 25;
+const GRID_COL_LENGTH = 10;
 
-const START_NODE_ROW = 5;
-const START_NODE_COL = 5;
+const START_NODE_ROW = 3;
+const START_NODE_COL = 2;
 
-const END_NODE_ROW = 5;
-const END_NODE_COL = 11;
+const END_NODE_ROW = 8;
+const END_NODE_COL = 21;
 
+const sleep = (ms) => {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+};
 
 // React uses JSX not plain javascript, first letter of tag indicates elements. 
 // Uppercase used to specify react components; ie cant camelCase.
@@ -26,8 +30,6 @@ export default class PathfindingVisualizer extends React.Component {
 
     componentDidMount() {
         this.resetGrid();
-        // const grid = this.mapGrid();
-        // this.setState(grid);
     }
 
     resetGrid() {
@@ -35,7 +37,7 @@ export default class PathfindingVisualizer extends React.Component {
         for (let i = 0; i < GRID_COL_LENGTH; i++) {
             let currentRow = [];
             for (let j = 0; j < GRID_ROW_LENGTH; j++) {
-                const newNode = createNode(i,j)
+                const newNode = createNode(i, j)
                 // currentRow.push(createNode(i, j));
                 currentRow.push(newNode);
                 // console.log(newNode);
@@ -46,7 +48,7 @@ export default class PathfindingVisualizer extends React.Component {
     }
 
     handleMouseDown(row, col) {
-        this.setState({mouseLeftDown: true});
+        this.setState({ mouseLeftDown: true });
         return;
     }
 
@@ -56,19 +58,8 @@ export default class PathfindingVisualizer extends React.Component {
     }
 
     handleMouseUp(row, col) {
-        this.setState({mouseLeftDown: false});
+        this.setState({ mouseLeftDown: false });
         return;
-    }
-
-    helperDikjstras() { 
-        const {grid} = this.state;
-        // console.log(grid);
-        const startnode = grid[START_NODE_ROW][START_NODE_COL];
-        const endnode = grid[END_NODE_ROW][END_NODE_COL];
-        Dikjstras(grid, startnode, endnode);
-
-        return;
-
     }
 
 
@@ -84,18 +75,18 @@ export default class PathfindingVisualizer extends React.Component {
     }
 
     mapGrid() {
-        const {grid } = this.state;
+        const { grid } = this.state;
         return grid.map((row, rowId) => {
             return (
                 <div key={rowId}>
                     {row.map((node, nodeId) => {
                         let { startnode, endnode, distance, isVisited, isWall, previousNode } = node;
                         return <Node
-                            key={nodeId} 
-                            row={rowId} 
-                            col={nodeId} 
-                            startnode={startnode} 
-                            endnode={endnode} 
+                            key={nodeId}
+                            row={rowId}
+                            col={nodeId}
+                            startnode={startnode}
+                            endnode={endnode}
                             // distance={distance}
                             // isVisited={isVisited}
                             isWall={isWall}
@@ -111,16 +102,79 @@ export default class PathfindingVisualizer extends React.Component {
         })
     }
 
-    
+
+    // Follows previousNode property from endNode to startNode.
+    // Must be called AFTER pathfinding algo
+    shortestPathFromEnd(startNode, endNode) {
+        // console.log('shortestPathFromEnd');
+        // console.log(endNode);
+        // console.log(startNode);
+        const path = [];
+        let currentNode = endNode
+        while (currentNode != null) {
+            // let i = 0;
+            // while (i < 50) {
+            console.log("shortestPathFromEnd");
+            console.log(currentNode);
+            path.unshift(currentNode);
+            currentNode = currentNode.previousNode;
+            // i++;
+        }
+        return path;
+    }
+
+
+    helperDikjstras = async () => {
+        const { grid } = this.state;
+        const startnode = grid[START_NODE_ROW][START_NODE_COL];
+        const endnode = grid[END_NODE_ROW][END_NODE_COL];
+        const visitedNodes = Dikjstras(grid, startnode, endnode);
+        console.log(visitedNodes);
+        const path = this.shortestPathFromEnd(startnode, endnode);
+
+        // await this.colorVisited(visitedNodes);
+        // await this.colorPath(path);
+        this.colorVisited(visitedNodes).then(() => {this.colorPath(path)});
+        // this.colorVisited(visitedNodes).then(() => this.colorPath(path));
+    }
+
+    colorVisited = async (visitedNodes) => {
+        for (let i = 0; i < visitedNodes.length; i++) {
+            console.log("colorVisited")
+            setTimeout(() => {
+                const node = visitedNodes[i];
+                var element = document.getElementById(`node-${node.row}-${node.col}`);
+                if (!element.classList.contains("startnode") && !element.classList.contains("endnode")) {
+                    element.classList.add("node-visited");
+                }
+            }, 10 * i);
+        }
+        return;
+    }
+
+    colorPath = async (path) =>{
+        for (let i = 0; i < path.length; i++) {
+            console.log("colorPath")
+            setTimeout(() => {
+                const node = path[i];
+                var element = document.getElementById(`node-${node.row}-${node.col}`);
+                if (!element.classList.contains("startnode") && !element.classList.contains("endnode")) {
+                    element.classList.add("node-path");
+                }
+            }, 100 * i);
+        }
+        return;
+    }
+
 
     render() {
         const { grid } = this.state;
         return (
             <React.Fragment>
-            <div className="button-bar">
-                <button onClick={() => console.log(this.state.grid)}> check grid</button>
-                <button onClick={() => this.helperDikjstras()}>Dikjstras</button>
-            </div>
+                <div className="button-bar">
+                    <button onClick={() => console.log(this.state.grid)}> check grid</button>
+                    <button onClick={() => this.helperDikjstras()}>Dikjstras</button>
+                </div>
                 <div className="grid-container">
                     {/* {grid.map((row, rowId) => {
                         return (
@@ -156,12 +210,12 @@ export default class PathfindingVisualizer extends React.Component {
 
 function createNode(row, col) {
     return {
+        isVisited: false,
         row: row,
         col: col,
         startnode: row === START_NODE_ROW && col === START_NODE_COL,
         endnode: row === END_NODE_ROW && col === END_NODE_COL,
         distance: Infinity,
-        isVisited: false,
         isWall: false,
         previousNode: null
     }
@@ -170,14 +224,16 @@ function createNode(row, col) {
 // return array of unvisited neighbors of node
 // does not include diagonal
 export function getUnvisitedNeighbors(grid, node) {
-    const {row , col} = node;
-    const neighbors = [];
+    const { row, col } = node;
+    let neighbors = [];
     if (row < grid.length - 1) neighbors.push(grid[row + 1][col]);
     if (col < grid[0].length - 1) neighbors.push(grid[row][col + 1]);
     if (row > 0) neighbors.push(grid[row - 1][col]);
     if (col > 0) neighbors.push(grid[row][col - 1]);
+    // console.log("before");
     // console.log(neighbors);
-    neighbors.filter(neighbor => !neighbor.isVisited);
+    neighbors = neighbors.filter(neighbor => !neighbor.isVisited);     //returning same array
+    // console.log("after")
     // console.log(neighbors);
     return neighbors;
 
@@ -200,4 +256,25 @@ export function getAllNodes(grid) {
 // sorts input array of nodes by their distance
 export function sortNodesByDistance(unvisitedNodes) {
     unvisitedNodes.sort((nodeA, nodeB) => nodeA.distance - nodeB.distance);
-  }
+}
+
+
+// const node = {row: 4, col: 10};
+// //const {row, col} = node;
+
+// const grid = [
+//   {isVisited: true,  row: 3, col: 9 },
+//   {isVisited: false, row: 3, col: 10}, 
+//   {isVisited: true,  row: 4, col: 9 },
+//   {isVisited: false, row: 4, col: 11},
+//   {isVisited: true,  row: 5, col: 10},
+//   {isVisited: true,  row: 5, col: 11}
+// ];
+
+// const dist=(n,r,c)=>{return Math.abs(Math.sqrt(Math.pow(n.row-r, 2)+Math.pow(n.col-c, 2)))}
+
+// let neighbors = grid.filter(
+//   function(e) {return e.isVisited && dist(e, this.row, this.col) == 1;
+// }, node);
+
+// console.log(neighbors);

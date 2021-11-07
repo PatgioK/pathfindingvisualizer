@@ -19,34 +19,42 @@ export function Dikjstras(grid, startNode, endNode) {
 
     // !! = cast to boolean
     while (!!unvisitedNodes.length) {
+        console.log("DikjstraWhile");
 
         sortNodesByDistance(unvisitedNodes);
-        const currentNode = startNode;
+        const currentNode = unvisitedNodes.shift();
+        currentNode.isVisited = true;
         // 3. Calculate distance of all unvisited neighbor nodes through currentNode
         //    compare new distance with assigned distance, assign smaller distance.
 
-        const unvisitedNeighbors = getUnvisitedNeighbors(grid, currentNode);
-        for (const neighbor of unvisitedNeighbors) {
-            neighbor.distance = currentNode.distance + 1; //neighbor dist always greater
-            neighbor.previousNode = currentNode;
-        }
-
+        updateNeighbors(grid, currentNode);
         // 4. Mark currentNode visted, remove from unvisited set.
-        currentNode.isVisited = true;
-        unvisitedNodes.shift();
+        // unvisitedNodes.shift();
+        visitedNodes.push(currentNode);
 
         // 5. if endNode is visited or smallest distance of unvisited nodes is infinite
         //    stop algo
-        if (endNode.isVisited) return;
+        if (endNode.isVisited) return visitedNodes;
 
-        sortNodesByDistance(unvisitedNodes);
-        if (unvisitedNodes.length || unvisitedNodes[0].distance == Infinity) return;
+        // sortNodesByDistance(unvisitedNodes);
+        updateNeighbors(grid, currentNode);
+        // if (unvisitedNodes.length || unvisitedNodes[0].distance == Infinity) return visitedNodes;
 
         // 6. select unvisited node with lowest distance, set to current node
         //    loop back to step 3
-
-
         // console.log(grid);
-
     }
 }
+
+function updateNeighbors(grid, currentNode) {
+    const unvisitedNeighbors = getUnvisitedNeighbors(grid, currentNode);
+    for (const neighbor of unvisitedNeighbors) {
+        neighbor.distance = currentNode.distance + 1; //neighbor dist always greater
+        if (neighbor.previousNode == null) {
+            neighbor.previousNode = currentNode;
+        }
+    }
+
+
+}
+
