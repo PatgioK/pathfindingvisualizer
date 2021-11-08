@@ -3,13 +3,13 @@ import Node from "./Node";
 import "./PathfindingVisualizer.css";
 import { Dikjstras } from "./Algorithms/Dikjstras";
 import { setTimeout } from 'timers';
+import { MouseStrat, StartEndStrat, WallStrat } from "./MouseStrat";
 
 const GRID_ROW_LENGTH = 25;
 const GRID_COL_LENGTH = 10;
 
 const START_NODE_ROW = 6;
 const START_NODE_COL = 24;
-
 const END_NODE_ROW = 8;
 const END_NODE_COL = 2;
 
@@ -27,11 +27,16 @@ export default class PathfindingVisualizer extends React.Component {
         this.state = {
             grid: [],
             mouseLeftDown: false,
+            // mouseStrat: null,
         };
+        const mouseStrat2 = null;
     }
 
     componentDidMount() {
         this.resetGrid();
+        // this.mouseStrat = new StartEndStrat();
+        this.mouseStrat2 = new StartEndStrat();
+        console.log(this.mouseStrat2);
     }
 
     resetGrid() {
@@ -47,21 +52,6 @@ export default class PathfindingVisualizer extends React.Component {
             grid.push(currentRow);
         }
         this.setState({ grid });
-    }
-
-    handleMouseDown(row, col) {
-        this.setState({ mouseLeftDown: true });
-        return;
-    }
-
-    handleMouseEnter(row, col) {
-        // console.log("row: " + row + " col: " + col);
-        return;
-    }
-
-    handleMouseUp(row, col) {
-        this.setState({ mouseLeftDown: false });
-        return;
     }
 
 
@@ -93,9 +83,9 @@ export default class PathfindingVisualizer extends React.Component {
                             // isVisited={isVisited}
                             isWall={isWall}
                             // previousNode={previousNode}
-                            onMouseDown={(row, col) => this.handleMouseDown(row, col)}
-                            onMouseEnter={(row, col) => this.handleMouseEnter(row, col)}
-                            onMouseUp={(row, col) => this.handleMouseUp(row, col)}
+                            onMouseDown={(row, col) => this.mouseStrat2.handleMouseDown(row, col)}
+                            onMouseEnter={(row, col) => this.mouseStrat2.handleMouseEnter(row, col)}
+                            onMouseUp={(row, col) => this.mouseStrat2.handleMouseUp(row, col)}
 
                         ></Node>
                     })}
@@ -190,6 +180,11 @@ export default class PathfindingVisualizer extends React.Component {
         return;
     }
 
+    setWallStrat() {
+        // let strat = new WallStrat();
+        // this.setState({mouseStrat: {strat}});
+        this.mouseStrat2 = new WallStrat();
+    }
 
     render() {
         const { grid } = this.state;
@@ -198,6 +193,8 @@ export default class PathfindingVisualizer extends React.Component {
                 <div className="button-bar">
                     <button onClick={() => console.log(this.state.grid)}> check grid</button>
                     <button onClick={() => this.helperDikjstras()}>Dikjstras</button>
+                    <button onClick={() => this.mouseStrat2 = new StartEndStrat()}>startendstrat</button>
+                    <button onClick={() => this.mouseStrat2 = new WallStrat()}>wallstrat</button>
                 </div>
                 <div className="grid-container">
                     {/* {grid.map((row, rowId) => {
@@ -230,7 +227,6 @@ export default class PathfindingVisualizer extends React.Component {
         );
     }
 }
-
 
 function createNode(row, col) {
     return {
@@ -267,7 +263,7 @@ export function getUnvisitedNeighbors2(grid, node) {
     const dist = (node, row, col, ) => { return Math.abs(Math.sqrt(Math.pow(node.row - row, 2) + Math.pow(node.col - col, 2))) }
     let neighbors = grid.filter(
         function (e) {
-            return e.isVisited && dist(e, this.row, this.col) == 1
+            return e.isVisited && dist(e, row, col) == 1
         }, node)
     return neighbors;
 
