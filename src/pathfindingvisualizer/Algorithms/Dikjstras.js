@@ -1,4 +1,4 @@
-import { getAllNodes, getUnvisitedNeighbors, sortNodesByDistance } from "../PathfindingVisualizer";
+import { getAllNodes,getUnvisitedNeighbors2, getUnvisitedNeighbors, sortNodesByDistance } from "../PathfindingVisualizer";
 
 // https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm
 
@@ -48,6 +48,7 @@ export function Dikjstras(grid, startNode, endNode) {
 
 function updateNeighbors(grid, currentNode) {
     const unvisitedNeighbors = getUnvisitedNeighbors(grid, currentNode);
+    // const unvisitedNeighbors = getUnvisitedNeighbors2(grid, currentNode);
     for (const neighbor of unvisitedNeighbors) {
         neighbor.distance = currentNode.distance + 1; //neighbor dist always greater
         if (neighbor.previousNode == null) {

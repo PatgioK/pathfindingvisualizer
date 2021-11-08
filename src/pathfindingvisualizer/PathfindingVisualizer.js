@@ -2,16 +2,18 @@ import React from "react";
 import Node from "./Node";
 import "./PathfindingVisualizer.css";
 import { Dikjstras } from "./Algorithms/Dikjstras";
-import { setTimeout} from 'timers';
+import { setTimeout } from 'timers';
 
 const GRID_ROW_LENGTH = 25;
 const GRID_COL_LENGTH = 10;
 
-const START_NODE_ROW = 3;
-const START_NODE_COL = 2;
+const START_NODE_ROW = 6;
+const START_NODE_COL = 24;
 
 const END_NODE_ROW = 8;
-const END_NODE_COL = 21;
+const END_NODE_COL = 2;
+
+const ANIMATION_SPEED = 100;
 
 const sleep = (ms) => {
     return new Promise((resolve) => setTimeout(resolve, ms));
@@ -132,36 +134,58 @@ export default class PathfindingVisualizer extends React.Component {
         console.log(visitedNodes);
         const path = this.shortestPathFromEnd(startnode, endnode);
 
+        await this.colorVisited(visitedNodes);
+        await this.colorPath(path);
+        // const a = this.colorVisited(visitedNodes);
+        // Promise.all([a]).then(() => this.colorPath(path));
+        // const b = await this.colorPath(path);
         // await this.colorVisited(visitedNodes);
         // await this.colorPath(path);
-        this.colorVisited(visitedNodes).then(() => {this.colorPath(path)});
+        // this.colorVisited(visitedNodes).then(() => {this.colorPath(path)});
         // this.colorVisited(visitedNodes).then(() => this.colorPath(path));
     }
+
+    // function make_base(img) {
+    //     return new Promise(function(resolve, reject) {
+    //       base_image = new Image();
+    //       base_image.src = img;
+    //       base_image.onload = function(){
+    //         context.drawImage(base_image, 0, 0);
+    //         resolve()
+    //       }
+    //   }
 
     colorVisited = async (visitedNodes) => {
         for (let i = 0; i < visitedNodes.length; i++) {
             console.log("colorVisited")
-            setTimeout(() => {
-                const node = visitedNodes[i];
-                var element = document.getElementById(`node-${node.row}-${node.col}`);
-                if (!element.classList.contains("startnode") && !element.classList.contains("endnode")) {
-                    element.classList.add("node-visited");
-                }
-            }, 10 * i);
+
+            const node = visitedNodes[i];
+
+            var element = document.getElementById(`node-${node.row}-${node.col}`);
+            if (!element.classList.contains("startnode") && !element.classList.contains("endnode")) {
+                element.classList.add("node-visited");
+            }
+            await sleep(ANIMATION_SPEED * 0.1);
+            // setTimeout(() => {
+            //     const node = visitedNodes[i];
+            //     var element = document.getElementById(`node-${node.row}-${node.col}`);
+            //     if (!element.classList.contains("startnode") && !element.classList.contains("endnode")) {
+            //         element.classList.add("node-visited");
+            //     }
+            // }, 10 * i);
         }
         return;
     }
 
-    colorPath = async (path) =>{
+    colorPath = async (path) => {
         for (let i = 0; i < path.length; i++) {
             console.log("colorPath")
-            setTimeout(() => {
                 const node = path[i];
                 var element = document.getElementById(`node-${node.row}-${node.col}`);
                 if (!element.classList.contains("startnode") && !element.classList.contains("endnode")) {
                     element.classList.add("node-path");
                 }
-            }, 100 * i);
+                await sleep(ANIMATION_SPEED * 0.5);
         }
         return;
     }
@@ -236,28 +260,18 @@ export function getUnvisitedNeighbors(grid, node) {
     // console.log("after")
     // console.log(neighbors);
     return neighbors;
-
 }
 
-//return array of all nodes in 1d array
-export function getAllNodes(grid) {
-    const nodes = [];
-    // console.log('start get all nodes');
-    // console.log(grid);
-    for (const row of grid) {
-        for (const node of row) {
-            nodes.push(node);
-        }
-    }
-    // console.log(nodes);
-    return nodes;
-}
+export function getUnvisitedNeighbors2(grid, node) {
+    const { row, col } = node;
+    const dist = (node, row, col, ) => { return Math.abs(Math.sqrt(Math.pow(node.row - row, 2) + Math.pow(node.col - col, 2))) }
+    let neighbors = grid.filter(
+        function (e) {
+            return e.isVisited && dist(e, this.row, this.col) == 1
+        }, node)
+    return neighbors;
 
-// sorts input array of nodes by their distance
-export function sortNodesByDistance(unvisitedNodes) {
-    unvisitedNodes.sort((nodeA, nodeB) => nodeA.distance - nodeB.distance);
 }
-
 
 // const node = {row: 4, col: 10};
 // //const {row, col} = node;
@@ -278,3 +292,22 @@ export function sortNodesByDistance(unvisitedNodes) {
 // }, node);
 
 // console.log(neighbors);
+
+//return array of all nodes in 1d array
+export function getAllNodes(grid) {
+    const nodes = [];
+    // console.log('start get all nodes');
+    // console.log(grid);
+    for (const row of grid) {
+        for (const node of row) {
+            nodes.push(node);
+        }
+    }
+    // console.log(nodes);
+    return nodes;
+}
+
+// sorts input array of nodes by their distance
+export function sortNodesByDistance(unvisitedNodes) {
+    unvisitedNodes.sort((nodeA, nodeB) => nodeA.distance - nodeB.distance);
+}
