@@ -10,11 +10,12 @@ export default class Node extends Component {
 
     render() {
 
-        const { startnode, endnode, distance, col, row, onMouseUp, onMouseDown, onMouseEnter } = this.props;
+        const { startnode, endnode, col, row, isWall, onMouseUp, onMouseDown, onMouseEnter } = this.props;
 
         let extraClassName = "";
         if (startnode === true) extraClassName = " startnode";
         if (endnode === true) extraClassName = " endnode"
+        if (isWall === true && endnode === false && startnode === false) extraClassName = " node-wall";
         // if (startNode == false && endNode == false) extraClassName = " ";
         return <div
             className={`Node ${extraClassName}`}

@@ -3,7 +3,7 @@ import Node from "./Node";
 import "./PathfindingVisualizer.css";
 import { Dikjstras } from "./Algorithms/Dikjstras";
 import { setTimeout } from 'timers';
-import { MouseStrat, StartEndStrat, WallStrat } from "./MouseStrat";
+import {  StartEndStrat, WallStrat } from "./MouseStrat";
 
 const GRID_ROW_LENGTH = 25;
 const GRID_COL_LENGTH = 10;
@@ -31,12 +31,15 @@ export default class PathfindingVisualizer extends React.Component {
         };
         const mouseStrat2 = null;
     }
+    changeStuff(paramsIfAny) {
+        this.setState({ grid: paramsIfAny });
+    }
 
     componentDidMount() {
         this.resetGrid();
         // this.mouseStrat = new StartEndStrat();
-        this.mouseStrat2 = new StartEndStrat();
-        console.log(this.mouseStrat2);
+        this.mouseStrat2 = new WallStrat();
+        // console.log(this.mouseStrat2);
     }
 
     resetGrid() {
@@ -83,6 +86,7 @@ export default class PathfindingVisualizer extends React.Component {
                             // isVisited={isVisited}
                             isWall={isWall}
                             // previousNode={previousNode}
+                            // onMouseDown={(row, col) => this.mouseStrat2.handleMouseDown(row, col)}
                             onMouseDown={(row, col) => this.mouseStrat2.handleMouseDown(row, col)}
                             onMouseEnter={(row, col) => this.mouseStrat2.handleMouseEnter(row, col)}
                             onMouseUp={(row, col) => this.mouseStrat2.handleMouseUp(row, col)}
@@ -135,16 +139,6 @@ export default class PathfindingVisualizer extends React.Component {
         // this.colorVisited(visitedNodes).then(() => this.colorPath(path));
     }
 
-    // function make_base(img) {
-    //     return new Promise(function(resolve, reject) {
-    //       base_image = new Image();
-    //       base_image.src = img;
-    //       base_image.onload = function(){
-    //         context.drawImage(base_image, 0, 0);
-    //         resolve()
-    //       }
-    //   }
-
     colorVisited = async (visitedNodes) => {
         for (let i = 0; i < visitedNodes.length; i++) {
             console.log("colorVisited")
@@ -170,12 +164,12 @@ export default class PathfindingVisualizer extends React.Component {
     colorPath = async (path) => {
         for (let i = 0; i < path.length; i++) {
             console.log("colorPath")
-                const node = path[i];
-                var element = document.getElementById(`node-${node.row}-${node.col}`);
-                if (!element.classList.contains("startnode") && !element.classList.contains("endnode")) {
-                    element.classList.add("node-path");
-                }
-                await sleep(ANIMATION_SPEED * 0.5);
+            const node = path[i];
+            var element = document.getElementById(`node-${node.row}-${node.col}`);
+            if (!element.classList.contains("startnode") && !element.classList.contains("endnode")) {
+                element.classList.add("node-path");
+            }
+            await sleep(ANIMATION_SPEED * 0.5);
         }
         return;
     }
@@ -186,6 +180,17 @@ export default class PathfindingVisualizer extends React.Component {
         this.mouseStrat2 = new WallStrat();
     }
 
+    getNewGridWithWallToggled  (grid, row, col) {
+        const newGrid = grid.slice();
+        const node = newGrid[row][col];
+        const newNode = {
+          ...node,
+          isWall: !node.isWall,
+        };
+        newGrid[row][col] = newNode;
+        return newGrid;
+      };
+
     render() {
         const { grid } = this.state;
         return (
@@ -193,8 +198,9 @@ export default class PathfindingVisualizer extends React.Component {
                 <div className="button-bar">
                     <button onClick={() => console.log(this.state.grid)}> check grid</button>
                     <button onClick={() => this.helperDikjstras()}>Dikjstras</button>
-                    <button onClick={() => this.mouseStrat2 = new StartEndStrat()}>startendstrat</button>
-                    <button onClick={() => this.mouseStrat2 = new WallStrat()}>wallstrat</button>
+                    <button onClick={() => this.mouseStrat2 = new StartEndStrat(this)}>startendstrat</button>
+                    <button onClick={() => this.mouseStrat2 = new WallStrat(this)}>wallstrat</button>
+                    {/* <MouseStrat changeHandler={this.changeStuff.bind(this)} /> */}
                 </div>
                 <div className="grid-container">
                     {/* {grid.map((row, rowId) => {
@@ -223,10 +229,14 @@ export default class PathfindingVisualizer extends React.Component {
                     })} */}
                     {this.mapGrid()}
                 </div>
+                <div>
+                </div>
             </React.Fragment>
         );
     }
 }
+
+
 
 function createNode(row, col) {
     return {
@@ -268,26 +278,6 @@ export function getUnvisitedNeighbors2(grid, node) {
     return neighbors;
 
 }
-
-// const node = {row: 4, col: 10};
-// //const {row, col} = node;
-
-// const grid = [
-//   {isVisited: true,  row: 3, col: 9 },
-//   {isVisited: false, row: 3, col: 10}, 
-//   {isVisited: true,  row: 4, col: 9 },
-//   {isVisited: false, row: 4, col: 11},
-//   {isVisited: true,  row: 5, col: 10},
-//   {isVisited: true,  row: 5, col: 11}
-// ];
-
-// const dist=(n,r,c)=>{return Math.abs(Math.sqrt(Math.pow(n.row-r, 2)+Math.pow(n.col-c, 2)))}
-
-// let neighbors = grid.filter(
-//   function(e) {return e.isVisited && dist(e, this.row, this.col) == 1;
-// }, node);
-
-// console.log(neighbors);
 
 //return array of all nodes in 1d array
 export function getAllNodes(grid) {

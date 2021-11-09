@@ -1,4 +1,4 @@
-import { getAllNodes,getUnvisitedNeighbors2, getUnvisitedNeighbors, sortNodesByDistance } from "../PathfindingVisualizer";
+import { getAllNodes, getUnvisitedNeighbors2, getUnvisitedNeighbors, sortNodesByDistance } from "../PathfindingVisualizer";
 
 // https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm
 
@@ -23,6 +23,7 @@ export function Dikjstras(grid, startNode, endNode) {
 
         sortNodesByDistance(unvisitedNodes);
         const currentNode = unvisitedNodes.shift();
+        if (currentNode.isWall) continue;
         currentNode.isVisited = true;
         // 3. Calculate distance of all unvisited neighbor nodes through currentNode
         //    compare new distance with assigned distance, assign smaller distance.
