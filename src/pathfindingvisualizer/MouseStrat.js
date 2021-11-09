@@ -27,13 +27,13 @@ export class StartEndStrat {
 export class WallStrat {
     handleMouseDown(row, col) {
         const newGrid = window.PathfindingVisualizer.getNewGridWithWallToggled(window.PathfindingVisualizer.state.grid, row, col);
-        window.PathfindingVisualizer.setState({grid: newGrid, mouseIsPressed: true});
+        window.PathfindingVisualizer.setState({grid: newGrid, mouseLeftDown: true});
     }
 
     handleMouseEnter(row, col) {
         console.log('wallstrat');
-
-        if (!window.PathfindingVisualizer.state.mouseIsPressed) return;
+        console.log(window.PathfindingVisualizer.state.mouseLeftDown);
+        if (!window.PathfindingVisualizer.state.mouseLeftDown) return;
         const newGrid = window.PathfindingVisualizer.getNewGridWithWallToggled(window.PathfindingVisualizer.state.grid, row, col);
         window.PathfindingVisualizer.setState({grid: newGrid});
 
