@@ -5,13 +5,13 @@ import { Dikjstras } from "./Algorithms/Dikjstras";
 import { setTimeout } from 'timers';
 import {  StartEndStrat, WallStrat } from "./MouseStrat";
 
-const GRID_ROW_LENGTH = 25;
-const GRID_COL_LENGTH = 10;
+const GRID_ROW_LENGTH = 45;
+const GRID_COL_LENGTH = 15;
 
-const START_NODE_ROW = 6;
-const START_NODE_COL = 24;
-const END_NODE_ROW = 8;
-const END_NODE_COL = 2;
+const START_NODE_ROW = 7;
+const START_NODE_COL = 3;
+const END_NODE_ROW = 7;
+const END_NODE_COL = 41;
 
 const ANIMATION_SPEED = 100;
 
@@ -55,6 +55,7 @@ export default class PathfindingVisualizer extends React.Component {
             grid.push(currentRow);
         }
         this.setState({ grid });
+        // this.mapGrid();
     }
 
 
@@ -190,6 +191,10 @@ export default class PathfindingVisualizer extends React.Component {
         newGrid[row][col] = newNode;
         return newGrid;
       };
+      
+  refreshPage() {
+    window.location.reload(false);
+  }
 
     render() {
         const { grid } = this.state;
@@ -197,9 +202,11 @@ export default class PathfindingVisualizer extends React.Component {
             <React.Fragment>
                 <div className="button-bar">
                     <button onClick={() => console.log(this.state.grid)}> check grid</button>
+                    <button onClick={() => this.refreshPage()}>reset grid</button>
                     <button onClick={() => this.helperDikjstras()}>Dikjstras</button>
                     <button onClick={() => this.mouseStrat2 = new StartEndStrat(this)}>startendstrat</button>
                     <button onClick={() => this.mouseStrat2 = new WallStrat(this)}>wallstrat</button>
+                    <a href="http://patgiok.azurewebsites.net/"><button>Home</button></a>
                     {/* <MouseStrat changeHandler={this.changeStuff.bind(this)} /> */}
                 </div>
                 <div className="grid-container">

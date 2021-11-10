@@ -32,7 +32,7 @@ export class WallStrat {
 
     handleMouseEnter(row, col) {
         console.log('wallstrat');
-        console.log(window.PathfindingVisualizer.state.mouseLeftDown);
+        // console.log(window.PathfindingVisualizer.state.mouseLeftDown);
         if (!window.PathfindingVisualizer.state.mouseLeftDown) return;
         const newGrid = window.PathfindingVisualizer.getNewGridWithWallToggled(window.PathfindingVisualizer.state.grid, row, col);
         window.PathfindingVisualizer.setState({grid: newGrid});

@@ -5,5 +5,29 @@
     font-size: 0;
     margin: 173px 0 0;
     white-space : nowrap; /* prevents divs from stacking if they dont fit on screen */
+    /* transform: rotate(90deg); */
     
 }
+body{
+    
+  background-color: #777;
+}
+
+
+.button-bar button {
+    background-color:#002570;
+    border: 1px solid White;
+    color: white; /* White text */
+    font-weight: bold;
+    padding: 10px 24px; 
+    cursor: pointer; /* Pointer/hand icon */
+    float: left; /* Float the buttons side by side */
+    width: 14.28%;
+  }
+
+  button:hover{
+      
+    background-color: #FFFEFC;
+    color: #9ED1E0;
+  }
+
