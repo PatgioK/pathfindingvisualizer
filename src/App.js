@@ -7,6 +7,7 @@ function App() {
   // const GlobalGrid = React.createContext([]);
   // ReactDOM.render(<PathfindingVisualizer ref={(PathfindingVisualizer) => {window.PathfindingVisualizer = PathfindingVisualizer}} />, document.getElementById("App"));
   return (
+    
     <div className="App">
       <PathfindingVisualizer ref={(PathfindingVisualizer) => {window.PathfindingVisualizer = PathfindingVisualizer}} />
       {/* <PathfindingVisualizer /> */}
