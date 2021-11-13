@@ -1,4 +1,5 @@
-import { getAllNodes, getUnvisitedNeighbors2, getUnvisitedNeighbors, sortNodesByDistance } from "../PathfindingVisualizer";
+import { getAllNodes, getUnvisitedNeighbors2, getUnvisitedNeighbors, getUnvisitedNeighborsDiag, sortNodesByDistance } from "../PathfindingVisualizer";
+
 
 
 // https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm
@@ -15,6 +16,7 @@ export function Dikjstras(grid, startNode, endNode) {
     // !! = cast to boolean
     while (!!unvisitedNodes.length) {
         sortNodesByDistance(unvisitedNodes);
+        console.log(unvisitedNodes);
         const currentNode = unvisitedNodes.shift();
         if (currentNode.isWall) continue;
 
@@ -38,13 +40,23 @@ export function Dikjstras(grid, startNode, endNode) {
 }
 
 function updateNeighbors(grid, currentNode) {
-    const unvisitedNeighbors = getUnvisitedNeighbors(grid, currentNode);
+    const unvisitedNeighbors = window.PathfindingVisualizer.getUnvisitedNeighbors(grid, currentNode);
     // const unvisitedNeighbors = getUnvisitedNeighbors2(grid, currentNode);\
 
     for (const neighbor of unvisitedNeighbors) {
         neighbor.distance = currentNode.distance + 1; //neighbor dist always greater
         if (neighbor.previousNode == null) {
             neighbor.previousNode = currentNode;
+        }
+    }
+    console.log(window.PathfindingVisualizer.diagonalPathing);
+    if(window.PathfindingVisualizer.diagonalPathing) {
+        const unvisitedNeighborsDiag = window.PathfindingVisualizer.getUnvisitedNeighborsDiag(grid, currentNode);
+        for (const neighbor of unvisitedNeighborsDiag) {
+            neighbor.distance = currentNode.distance + 1.4; //neighbor dist always greater
+            if (neighbor.previousNode == null) {
+                neighbor.previousNode = currentNode;
+            }
         }
     }
 }

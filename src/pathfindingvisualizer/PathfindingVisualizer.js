@@ -5,7 +5,7 @@ import { Dikjstras } from "./Algorithms/Dikjstras";
 import { setTimeout } from 'timers';
 import { StartEndStrat, WallStrat } from "./MouseStrat";
 
-const ANIMATION_SPEED = 100;
+const ANIMATION_SPEED = 4500;
 
 const sleep = (ms) => {
     return new Promise((resolve) => setTimeout(resolve, ms));
@@ -25,7 +25,7 @@ export default class PathfindingVisualizer extends React.Component {
             START_NODE_ROW: 7,
             START_NODE_COL: 3,
             END_NODE_ROW: 7,
-            END_NODE_COL: 11,
+            END_NODE_COL: 20,
         };
         const diagonalPathing = false;
         const mouseStrat2 = null;
@@ -37,6 +37,7 @@ export default class PathfindingVisualizer extends React.Component {
     componentDidMount() {
         this.resetGrid();
         this.mouseStrat2 = new StartEndStrat();
+        this.diagonalPathing = false;
         // console.log(this.mouseStrat2);
     }
 
@@ -102,8 +103,7 @@ export default class PathfindingVisualizer extends React.Component {
         const path = [];
         let currentNode = endNode
         while (currentNode != null) {
-            console.log("shortestPathFromEnd");
-            console.log(currentNode);
+            // console.log(currentNode);
             path.unshift(currentNode);
             currentNode = currentNode.previousNode;
         }
@@ -115,7 +115,7 @@ export default class PathfindingVisualizer extends React.Component {
         const startnode = grid[this.state.START_NODE_ROW][this.state.START_NODE_COL];
         const endnode = grid[this.state.END_NODE_ROW][this.state.END_NODE_COL];
         const visitedNodes = Dikjstras(grid, startnode, endnode);
-        console.log(visitedNodes);
+        // console.log(visitedNodes);
         const path = this.shortestPathFromEnd(startnode, endnode);
 
         await this.colorVisited(visitedNodes);
@@ -159,12 +159,12 @@ export default class PathfindingVisualizer extends React.Component {
 
     createNode(row, col) {
         return {
+            distance: Infinity,
             isVisited: false,
             row: row,
             col: col,
             startnode: row === this.state.START_NODE_ROW && col === this.state.START_NODE_COL,
             endnode: row === this.state.END_NODE_ROW && col === this.state.END_NODE_COL,
-            distance: Infinity,
             isWall: false,
             previousNode: null
         }
@@ -172,6 +172,33 @@ export default class PathfindingVisualizer extends React.Component {
 
     toggleDiagonal() {
         this.diagonalPathing = !this.diagonalPathing;
+        console.log(this.diagonalPathing);
+    }
+
+    // return array of unvisited neighbors of node
+    // does not include diagonal
+    getUnvisitedNeighbors(grid, node) {
+        const { row, col } = node;
+        let neighbors = [];
+        if (row < grid.length - 1) neighbors.push(grid[row + 1][col]);
+        if (col < grid[0].length - 1) neighbors.push(grid[row][col + 1]);
+        if (row > 0) neighbors.push(grid[row - 1][col]);
+        if (col > 0) neighbors.push(grid[row][col - 1]);
+
+        neighbors = neighbors.filter(neighbor => !neighbor.isVisited);
+        return neighbors;
+    }
+
+    getUnvisitedNeighborsDiag(grid, node) {
+        const { row, col } = node;
+        let neighbors = [];
+        if (row < grid.length - 1 && col < grid[0].length - 1) neighbors.push(grid[row + 1][col + 1]);
+        if (row < grid.length - 1 && col > 0) neighbors.push(grid[row + 1][col - 1]);
+        if (row > 0 && col > 0) neighbors.push(grid[row - 1][col - 1]);
+        if (row > 0 && col < grid[0].length - 1) neighbors.push(grid[row - 1][col + 1]);
+
+        neighbors = neighbors.filter(neighbor => !neighbor.isVisited);
+        return neighbors;
     }
 
     render() {
@@ -195,39 +222,6 @@ export default class PathfindingVisualizer extends React.Component {
     }
 }
 
-// return array of unvisited neighbors of node
-// does not include diagonal
-export function getUnvisitedNeighbors(grid, node) {
-    const { row, col } = node;
-    let neighbors = [];
-    if (row < grid.length - 1) neighbors.push(grid[row + 1][col]);
-    if (col < grid[0].length - 1) neighbors.push(grid[row][col + 1]);
-    if (row > 0) neighbors.push(grid[row - 1][col]);
-    if (col > 0) neighbors.push(grid[row][col - 1]);
-    if (window.PathfindingVisualizer.state.diagonalPathing) {
-        // console.log('diags');
-        if (row < grid.length - 1 && col < grid[0].length - 1) neighbors.push(grid[row + 1][col + 1]);
-        if (row < grid.length - 1 && col > 0) neighbors.push(grid[row + 1][col - 1]);
-        if (row > 0 && col > 0) neighbors.push(grid[row - 1][col - 1]);
-        if (row > 0 && col < grid[0].lenght - 1) neighbors.push(grid[row - 1][col + 1]);
-    }
-    neighbors = neighbors.filter(neighbor => !neighbor.isVisited);
-    return neighbors;
-}
-
-export function getUnvisitedNeighbors2(grid, node) {
-    const { row, col } = node;
-    const dist = (node, row, col, ) => { return Math.abs(Math.sqrt(Math.pow(node.row - row, 2) + Math.pow(node.col - col, 2))) }
-    let neighbors = grid.filter(
-        function (e) {
-            console.log(`e.isVisited: ${e.isVisited}`);
-            let nodeDist = e.isVisited && dist(e, row, col) == 1
-            console.log(`node dist: ${nodeDist}`);
-            return nodeDist;
-        }, node)
-    console.log(neighbors);
-    return neighbors;
-}
 
 //return array of all nodes in 1d array
 export function getAllNodes(grid) {
@@ -244,3 +238,28 @@ export function getAllNodes(grid) {
 export function sortNodesByDistance(unvisitedNodes) {
     unvisitedNodes.sort((nodeA, nodeB) => nodeA.distance - nodeB.distance);
 }
+
+
+
+// takes too long, has to check every node
+// export function getUnvisitedNeighbors3(nodes, currentNode) {
+//     console.log('getUnvisitedNeighbors3');
+//     console.log(nodes);
+//     // console.log(currentNode);
+//     const { row, col, } = currentNode;
+//     let neighbors = [];
+//     neighbors = nodes.filter(
+//         function (node) {
+//             return !node.isVisited && dist(node, row, col) == 1.0
+
+//             // return !node.isVisited && dist(node, row, col) == 1.4
+//         })
+//     console.log(neighbors);
+//     return neighbors;
+// }
+// function dist(n, r, c) {
+//     let num = Math.sqrt(Math.pow(n.row - r, 2) + Math.pow(n.col - c, 2))
+//     num = num.toFixed(1);
+//     console.log(num);
+//     return num;
+// }
