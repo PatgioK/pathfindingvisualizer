@@ -44,16 +44,25 @@ function updateNeighbors(grid, currentNode) {
     // const unvisitedNeighbors = getUnvisitedNeighbors2(grid, currentNode);\
 
     for (const neighbor of unvisitedNeighbors) {
-        neighbor.distance = currentNode.distance + 1; //neighbor dist always greater
+        let nei = neighbor.distance;
+        let cur = currentNode.distance + 1;
+        neighbor.distance = nei > cur ? cur: nei;
+        // neighbor.distance = currentNode.distance + 1; //neighbor dist always greater
         if (neighbor.previousNode == null) {
             neighbor.previousNode = currentNode;
         }
     }
+
+    // BUG: incrementing unvisited neighbors more than once if diag. add check for calculated dist and current dist and assign lower.
+    // also need checks to allow / disallow diagonal pathing through corners
     console.log(window.PathfindingVisualizer.diagonalPathing);
     if(window.PathfindingVisualizer.diagonalPathing) {
         const unvisitedNeighborsDiag = window.PathfindingVisualizer.getUnvisitedNeighborsDiag(grid, currentNode);
         for (const neighbor of unvisitedNeighborsDiag) {
-            neighbor.distance = currentNode.distance + 1.4; //neighbor dist always greater
+            let nei = neighbor.distance;
+            let cur = currentNode.distance + 1.4;
+            neighbor.distance = nei > cur ? cur: nei;
+            // neighbor.distance = currentNode.distance + 1.4; //neighbor dist always greater
             if (neighbor.previousNode == null) {
                 neighbor.previousNode = currentNode;
             }

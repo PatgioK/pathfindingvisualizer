@@ -5,7 +5,7 @@ import { Dikjstras } from "./Algorithms/Dikjstras";
 import { setTimeout } from 'timers';
 import { StartEndStrat, WallStrat } from "./MouseStrat";
 
-const ANIMATION_SPEED = 4500;
+const ANIMATION_SPEED = 100;
 
 const sleep = (ms) => {
     return new Promise((resolve) => setTimeout(resolve, ms));
@@ -61,6 +61,8 @@ export default class PathfindingVisualizer extends React.Component {
                 // console.log(`node-${i}-${j}`);
                 let node = document.getElementById(`node-${i}-${j}`);
                 // node.className = "Node";
+
+                //these classes not set by Node.js, not in state grid so manual remove
                 node.classList.remove("node-visited");
                 node.classList.remove("node-path");
             }
