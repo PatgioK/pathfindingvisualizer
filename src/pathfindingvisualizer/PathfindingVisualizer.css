@@ -3,7 +3,7 @@
     height: 94vh; /* Magic here */
     display: inline-block;
     font-size: 0;
-    margin: 173px 0 0;
+    margin: 103px 0 0;
     white-space : nowrap; /* prevents divs from stacking if they dont fit on screen */
     /* transform: rotate(90deg); */
     

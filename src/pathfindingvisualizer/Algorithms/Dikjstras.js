@@ -16,13 +16,16 @@ export function Dikjstras(grid, startNode, endNode) {
     // !! = cast to boolean
     while (!!unvisitedNodes.length) {
         sortNodesByDistance(unvisitedNodes);
-        console.log(unvisitedNodes);
+        // console.log(unvisitedNodes);
         const currentNode = unvisitedNodes.shift();
-        if (currentNode.isWall) continue;
 
         // if all nodes distance is infinity, we are stuck
         if (currentNode.distance === Infinity) return visitedNodes;
+        if (currentNode.isWall) continue;
+
+
         currentNode.isVisited = true;
+        if (endNode.isVisited) return visitedNodes;
         // 3. Calculate distance of all unvisited neighbor nodes through currentNode
         //    compare new distance with assigned distance, assign smaller distance.
         updateNeighbors(grid, currentNode);
@@ -32,7 +35,6 @@ export function Dikjstras(grid, startNode, endNode) {
 
         // 5. if endNode is visited or smallest distance of unvisited nodes is infinite
         //    stop algo
-        if (endNode.isVisited) return visitedNodes;
         // 6. select unvisited node with lowest distance, set to current node
         //    loop back to step 3
         // console.log(grid);
@@ -53,9 +55,6 @@ function updateNeighbors(grid, currentNode) {
         }
     }
 
-    // BUG: incrementing unvisited neighbors more than once if diag. add check for calculated dist and current dist and assign lower.
-    // also need checks to allow / disallow diagonal pathing through corners
-    console.log(window.PathfindingVisualizer.diagonalPathing);
     if(window.PathfindingVisualizer.diagonalPathing) {
         const unvisitedNeighborsDiag = window.PathfindingVisualizer.getUnvisitedNeighborsDiag(grid, currentNode);
         for (const neighbor of unvisitedNeighborsDiag) {

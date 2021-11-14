@@ -4,6 +4,7 @@ import "./PathfindingVisualizer.css";
 import { Dikjstras } from "./Algorithms/Dikjstras";
 import { setTimeout } from 'timers';
 import { StartEndStrat, WallStrat } from "./MouseStrat";
+import { Astar } from "./Algorithms/Astar"
 
 const ANIMATION_SPEED = 100;
 
@@ -19,8 +20,8 @@ export default class PathfindingVisualizer extends React.Component {
         this.state = {
             grid: [],
             mouseLeftDown: false,
-            GRID_ROW_LENGTH: 25,
-            GRID_COL_LENGTH: 15,
+            GRID_ROW_LENGTH: 45,
+            GRID_COL_LENGTH: 25,
 
             START_NODE_ROW: 7,
             START_NODE_COL: 3,
@@ -30,9 +31,6 @@ export default class PathfindingVisualizer extends React.Component {
         const diagonalPathing = false;
         const mouseStrat2 = null;
     }
-    changeStuff(paramsIfAny) {
-        this.setState({ grid: paramsIfAny });
-    }
 
     componentDidMount() {
         this.resetGrid();
@@ -41,7 +39,34 @@ export default class PathfindingVisualizer extends React.Component {
         // console.log(this.mouseStrat2);
     }
 
-    resetGrid() {
+    resetWall = async () => {
+        const grid = this.state.grid;
+        for (let i = 0; i < this.state.GRID_COL_LENGTH; i++) {
+            for (let j = 0; j < this.state.GRID_ROW_LENGTH; j++) {
+                grid[i][j].isWall = false;
+            }
+        }
+        this.setState({ grid: grid });
+        return;
+    }
+
+    resetPath = async () => {
+        const grid = this.state.grid;
+        for (let i = 0; i < this.state.GRID_COL_LENGTH; i++) {
+            for (let j = 0; j < this.state.GRID_ROW_LENGTH; j++) {
+                grid[i][j].previousNode = null;
+                grid[i][j].distance = Infinity;
+                grid[i][j].isVisited = false;
+                grid[i][j].Gcost = Infinity;
+                grid[i][j].Hcost = Infinity;
+
+            }
+        }
+        this.setState({ grid: grid });
+        return;
+    }
+
+    resetGrid = async () => {
         const grid = [];
         for (let i = 0; i < this.state.GRID_COL_LENGTH; i++) {
             let currentRow = [];
@@ -52,22 +77,20 @@ export default class PathfindingVisualizer extends React.Component {
             grid.push(currentRow);
         }
         this.setState({ grid });
+        return;
     }
 
-    resetGridAndCss() {
-        // this.resetGrid();
+    resetCss = async () => {
         for (let i = 0; i < this.state.GRID_COL_LENGTH; i++) {
             for (let j = 0; j < this.state.GRID_ROW_LENGTH; j++) {
-                // console.log(`node-${i}-${j}`);
                 let node = document.getElementById(`node-${i}-${j}`);
-                // node.className = "Node";
 
-                //these classes not set by Node.js, not in state grid so manual remove
+                //these classes not set by Node.js, not in state grid so manual remove, only for animation
                 node.classList.remove("node-visited");
                 node.classList.remove("node-path");
             }
         }
-        this.resetGrid();
+        return;
     }
 
     mapGrid() {
@@ -86,7 +109,7 @@ export default class PathfindingVisualizer extends React.Component {
                             // distance={distance}
                             // isVisited={isVisited}
                             isWall={isWall}
-                            // previousNode={previousNode}
+                            // previousNode={previousNode}  
                             // onMouseDown={(row, col) => this.mouseStrat2.handleMouseDown(row, col)}
                             onMouseDown={(row, col) => this.mouseStrat2.handleMouseDown(row, col)}
                             onMouseEnter={(row, col) => this.mouseStrat2.handleMouseEnter(row, col)}
@@ -112,7 +135,22 @@ export default class PathfindingVisualizer extends React.Component {
         return path;
     }
 
+    helperAstar = async () => {
+        await this.resetCss();
+        await this.resetPath();
+        const { grid } = this.state;
+        const startnode = grid[this.state.START_NODE_ROW][this.state.START_NODE_COL];
+        const endnode = grid[this.state.END_NODE_ROW][this.state.END_NODE_COL];
+        const visitedNodes = Astar(grid, startnode, endnode, this.diagonalPathing);
+
+        const path = this.shortestPathFromEnd(startnode, endnode);
+        await this.colorVisited(visitedNodes);
+        await this.colorPath(path);
+    }
+
     helperDikjstras = async () => {
+        await this.resetCss();
+        await this.resetPath();
         const { grid } = this.state;
         const startnode = grid[this.state.START_NODE_ROW][this.state.START_NODE_COL];
         const endnode = grid[this.state.END_NODE_ROW][this.state.END_NODE_COL];
@@ -168,7 +206,10 @@ export default class PathfindingVisualizer extends React.Component {
             startnode: row === this.state.START_NODE_ROW && col === this.state.START_NODE_COL,
             endnode: row === this.state.END_NODE_ROW && col === this.state.END_NODE_COL,
             isWall: false,
-            previousNode: null
+            previousNode: null,
+            Hcost: Infinity,
+            Gcost: Infinity,
+            
         }
     }
 
@@ -191,13 +232,32 @@ export default class PathfindingVisualizer extends React.Component {
         return neighbors;
     }
 
+    // also need checks to allow / disallow diagonal pathing through corners
     getUnvisitedNeighborsDiag(grid, node) {
         const { row, col } = node;
         let neighbors = [];
-        if (row < grid.length - 1 && col < grid[0].length - 1) neighbors.push(grid[row + 1][col + 1]);
-        if (row < grid.length - 1 && col > 0) neighbors.push(grid[row + 1][col - 1]);
-        if (row > 0 && col > 0) neighbors.push(grid[row - 1][col - 1]);
-        if (row > 0 && col < grid[0].length - 1) neighbors.push(grid[row - 1][col + 1]);
+        if (this.diagonalPathing) {
+            // ⬉
+            if (row > 0 && col > 0) {
+                if (!grid[row - 1][col].isWall || !grid[row][col - 1].isWall)
+                    neighbors.push(grid[row - 1][col - 1]);
+            }
+            // ⬈
+            if (row > 0 && col < grid[0].length - 1) {
+                if (!grid[row - 1][col].isWall || !grid[row][col + 1].isWall)
+                    neighbors.push(grid[row - 1][col + 1]);
+            }
+            // ⬊
+            if (row < grid.length - 1 && col < grid[0].length - 1) {
+                if (!grid[row + 1][col].isWall || !grid[row][col + 1].isWall)
+                    neighbors.push(grid[row + 1][col + 1]);
+            }
+            // ⬋
+            if (row < grid.length - 1 && col > 0) {
+                if (!grid[row + 1][col].isWall || !grid[row][col - 1].isWall)
+                    neighbors.push(grid[row + 1][col - 1]);
+            }
+        }
 
         neighbors = neighbors.filter(neighbor => !neighbor.isVisited);
         return neighbors;
@@ -208,8 +268,10 @@ export default class PathfindingVisualizer extends React.Component {
         return (
             <React.Fragment>
                 <div className="button-bar">
-                    <button onClick={() => console.log(this.state.grid)}> check grid</button>
-                    <button onClick={() => this.resetGridAndCss()}>reset grid</button>
+                    {/* <button onClick={() => console.log(this.state.grid)}> check grid</button> */}
+                    <button onClick={() => this.resetGrid()}>reset grid</button>
+                    <button onClick={() => this.resetWall()}>reset walls</button>
+                    <button onClick={() => this.helperAstar()}>Astar</button>
                     <button onClick={() => this.helperDikjstras()}>Dikjstras</button>
                     <button onClick={() => this.mouseStrat2 = new StartEndStrat(this)}>startendstrat</button>
                     <button onClick={() => this.mouseStrat2 = new WallStrat(this)}>wallstrat</button>
@@ -241,6 +303,13 @@ export function sortNodesByDistance(unvisitedNodes) {
     unvisitedNodes.sort((nodeA, nodeB) => nodeA.distance - nodeB.distance);
 }
 
+// if both distance equal, first condition is 0 and considered false, then second part of condition is executed.
+export function sortNodesByDistanceThenHcost(unvisitedNodes) {
+    unvisitedNodes.sort(function (nodeA, nodeB) {
+        return nodeA.distance - nodeB.distance || nodeA.Hcost - nodeB.Hcost
+
+    })
+}
 
 
 // takes too long, has to check every node
