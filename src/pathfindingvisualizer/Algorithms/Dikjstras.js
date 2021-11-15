@@ -61,7 +61,6 @@ function updateNeighbors(grid, currentNode) {
             let nei = neighbor.distance;
             let cur = currentNode.distance + 1.4;
             neighbor.distance = nei > cur ? cur: nei;
-            // neighbor.distance = currentNode.distance + 1.4; //neighbor dist always greater
             if (neighbor.previousNode == null) {
                 neighbor.previousNode = currentNode;
             }
