@@ -12,9 +12,10 @@ function minHeapify(array, index, arrLength) {
     var left = index * 2 + 1;
     var right = index * 2 + 2;
 
-    if (array[left].distance < array[smallest].distance)
+    // console.log(array[left]);
+    if (left < arrLength && array[left].distance < array[smallest].distance)
         smallest = left;
-    if (array[right].distance < array[smallest].distance)
+    if (right < arrLength && array[right].distance < array[smallest].distance)
         smallest = right;
 
     if (smallest != index) {

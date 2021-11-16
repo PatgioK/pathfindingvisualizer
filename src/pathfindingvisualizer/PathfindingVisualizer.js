@@ -23,8 +23,8 @@ export default class PathfindingVisualizer extends React.Component {
         this.state = {
             grid: [],
             mouseLeftDown: false,
-            GRID_ROW_LENGTH: 45,
-            GRID_COL_LENGTH: 25,
+            GRID_ROW_LENGTH: 40,
+            GRID_COL_LENGTH: 20,
 
             START_NODE_ROW: 10,
             START_NODE_COL: 7,
