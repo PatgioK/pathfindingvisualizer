@@ -1,4 +1,4 @@
-import { getAllNodes, sortNodesByDistance, sortNodesByDistanceThenHcost } from "../PathfindingVisualizer";
+import { getAllNodes } from "../PathfindingVisualizer";
 import { Manhattan, Octile, } from "../Heuristics";
 
 // Gcost = distance from starting node
@@ -62,14 +62,20 @@ function updateNeighbors(grid, currentNode, diagonalPathing) {
             neighbor.Hcost = curH;
             // let curH = Manhattan(neighbor);
             if (curG + curH < neighbor.distance) {
-                if(neighbor.Gcost > curG)neighbor.Gcost = curG;
+                if (neighbor.Gcost > curG) neighbor.Gcost = curG;
                 let dist = Math.round(curG + curH);
-                if(dist < neighbor.distance) {
-                neighbor.distance = dist
-                neighbor.previousNode = currentNode;
+                if (dist < neighbor.distance) {
+                    neighbor.distance = dist
+                    neighbor.previousNode = currentNode;
                 }
             }
         }
     }
     return;
+}
+// if both distance equal, first condition is 0 and considered false, then second part of condition is executed.
+export function sortNodesByDistanceThenHcost(unvisitedNodes) {
+    unvisitedNodes.sort(function (nodeA, nodeB) {
+        return nodeA.distance - nodeB.distance || nodeA.Hcost - nodeB.Hcost
+    })
 }

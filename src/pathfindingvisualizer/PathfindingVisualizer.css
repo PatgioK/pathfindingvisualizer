@@ -1,19 +1,18 @@
 .grid-container{
-    
     height: 94vh; /* Magic here */
     display: inline-block;
     font-size: 0;
     margin: 103px 0 0;
     white-space : nowrap; /* prevents divs from stacking if they dont fit on screen */
-    /* transform: rotate(90deg); */
-    
 }
 body{
-    
   background-color: #777;
 }
+.button-bar {
+  /* background-color:#002570; */
+  border-width: 0px; 
 
-
+}
 
 .button-bar button {
     background-color:#002570;
@@ -27,13 +26,6 @@ body{
   }
 
   button:hover{
-      
-    background-color: #FFFEFC;
+    background-color: #FFFEFC !important;
     color: #9ED1E0;
   }
-
-  .button-bar button.foo {
-    
-    background-color: #FFFEFC;
-  }
-

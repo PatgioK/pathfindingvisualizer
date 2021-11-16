@@ -1,4 +1,4 @@
-import { getAllNodes, getUnvisitedNeighbors2, getUnvisitedNeighbors, getUnvisitedNeighborsDiag, sortNodesByDistance } from "../PathfindingVisualizer";
+import { getAllNodes, } from "../PathfindingVisualizer";
 
 
 
@@ -15,6 +15,7 @@ export function Dikjstras(grid, startNode, endNode) {
 
     // !! = cast to boolean
     while (!!unvisitedNodes.length) {
+        console.log("dijkstra");
         sortNodesByDistance(unvisitedNodes);
         // console.log(unvisitedNodes);
         const currentNode = unvisitedNodes.shift();
@@ -22,7 +23,6 @@ export function Dikjstras(grid, startNode, endNode) {
         // if all nodes distance is infinity, we are stuck
         if (currentNode.distance === Infinity) return visitedNodes;
         if (currentNode.isWall) continue;
-
 
         currentNode.isVisited = true;
         if (endNode.isVisited) return visitedNodes;
@@ -68,4 +68,8 @@ function updateNeighbors(grid, currentNode) {
     }
 }
 
+// sorts input array of nodes by their distance
+export function sortNodesByDistance(unvisitedNodes) {
+    unvisitedNodes.sort((nodeA, nodeB) => nodeA.distance - nodeB.distance);
+}
 

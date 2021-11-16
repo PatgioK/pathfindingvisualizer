@@ -5,12 +5,10 @@ export function GreedyBestFirst(grid, startNode, endNode, diagonalPathing) {
     const visitedNodes = [];
     const unvisitedNodes = getAllNodes(grid);
 
-    // console.log(unvisitedNodes);
     startNode.distance = 0;
     startNode.Hcost = 0;
 
     while (!!unvisitedNodes.length) {
-
         sortNodesByHcost(unvisitedNodes);
         const currentNode = unvisitedNodes.shift();
 
@@ -22,40 +20,47 @@ export function GreedyBestFirst(grid, startNode, endNode, diagonalPathing) {
         if (endNode.isVisited) return visitedNodes;
 
         updateNeighbors(grid, currentNode, diagonalPathing);
-
         visitedNodes.push(currentNode);
     }
 }
 
-
 function updateNeighbors(grid, currentNode, diagonalPathing) {
-    console.log('GBFS updateneighbors');
-
     const unvisitedNeighbors = window.PathfindingVisualizer.getUnvisitedNeighbors(grid, currentNode);
+
     for (const neighbor of unvisitedNeighbors) {
-        let h = Manhattan(neighbor);
+        let h = 0
+        if (!neighbor.isOpen) 
+            neighbor.isOpen = true;
+        
+        if (!diagonalPathing)
+            h = Manhattan(neighbor);
+        else
+            h = Octile(neighbor, 1);
+
         if (h < neighbor.Hcost) {
             neighbor.Hcost = h;
             neighbor.previousNode = currentNode;
         }
-
     }
 
     if (diagonalPathing) {
         const unvisitedNeighborsDiag = window.PathfindingVisualizer.getUnvisitedNeighborsDiag(grid, currentNode);
         for (const neighbor of unvisitedNeighborsDiag) {
-            let h = Manhattan(neighbor);
+            let h = 0
+            if (!neighbor.isOpen) {
+                neighbor.isOpen = true;
+                neighbor.previousNode = currentNode;
+            }
+            h = Octile(neighbor, 1)
+
             if (h < neighbor.Hcost) {
                 neighbor.Hcost = h;
-                neighbor.previousNode = currentNode;
             }
         }
     }
     return;
 }
 
-
 export function sortNodesByHcost(unvisitedNodes) {
-    // console.log('GBFS sortbyH');
     unvisitedNodes.sort((nodeA, nodeB) => nodeA.Hcost - nodeB.Hcost);
 }

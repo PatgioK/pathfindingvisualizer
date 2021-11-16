@@ -2,10 +2,12 @@ import React from "react";
 import Node from "./Node";
 import "./PathfindingVisualizer.css";
 import { setTimeout } from 'timers';
-import { StartEndStrat, WallStrat, GeneralStrat } from "./MouseStrat";
+import { GeneralStrat } from "./MouseStrat";
+// import { StartEndStrat, WallStrat, } from "./MouseStrat";
 import { Dikjstras } from "./Algorithms/Dikjstras";
 import { Astar } from "./Algorithms/Astar"
 import { GreedyBestFirst } from "./Algorithms/GreedyBestFirst"
+import { BFS } from "./Algorithms/BFS"
 
 const ANIMATION_SPEED = 100;
 
@@ -41,16 +43,17 @@ export default class PathfindingVisualizer extends React.Component {
 
     createNode(row, col) {
         return {
+            previousNode: null,
+            row: row,
+            col: col,
             Gcost: Infinity,
             Hcost: Infinity,
             distance: Infinity,
+            isOpen: false,
             isVisited: false,
-            row: row,
-            col: col,
             startnode: row === this.state.START_NODE_ROW && col === this.state.START_NODE_COL,
             endnode: row === this.state.END_NODE_ROW && col === this.state.END_NODE_COL,
             isWall: false,
-            previousNode: null,
         }
     }
 
@@ -74,7 +77,7 @@ export default class PathfindingVisualizer extends React.Component {
                 grid[i][j].isVisited = false;
                 grid[i][j].Gcost = Infinity;
                 grid[i][j].Hcost = Infinity;
-
+                grid[i][j].isOpen = false;
             }
         }
         this.setState({ grid: grid });
@@ -108,73 +111,6 @@ export default class PathfindingVisualizer extends React.Component {
         return;
     }
 
-    mapGrid() {
-        const { grid } = this.state;
-        return grid.map((row, rowId) => {
-            return (
-                <div key={rowId}>
-                    {row.map((node, nodeId) => {
-                        let { startnode, endnode, isWall, } = node;
-                        return <Node
-                            key={nodeId}
-                            row={rowId}
-                            col={nodeId}
-                            startnode={startnode}
-                            endnode={endnode}
-                            // distance={distance}
-                            // isVisited={isVisited}
-                            isWall={isWall}
-                            // previousNode={previousNode}  
-                            // onMouseDown={(row, col) => this.mouseStrat2.handleMouseDown(row, col)}
-                            onMouseDown={(row, col) => this.mouseStrat2.handleMouseDown(row, col)}
-                            onMouseEnter={(row, col) => this.mouseStrat2.handleMouseEnter(row, col)}
-                            onMouseUp={(row, col) => this.mouseStrat2.handleMouseUp(row, col)}
-
-                        ></Node>
-                    })}
-                </div>
-            )
-        })
-    }
-
-    GreedyBestFirstHelper = async () => {
-        await this.resetCss();
-        await this.resetPath();
-        const { grid } = this.state;
-        const startnode = grid[this.state.START_NODE_ROW][this.state.START_NODE_COL];
-        const endnode = grid[this.state.END_NODE_ROW][this.state.END_NODE_COL];
-        const visitedNodes = GreedyBestFirst(grid, startnode, endnode, this.diagonalPathing);
-
-        const path = this.shortestPathFromEnd(startnode, endnode);
-        await this.colorVisited(visitedNodes);
-        await this.colorPath(path);
-    }
-
-    helperAstar = async () => {
-        await this.resetCss();
-        await this.resetPath();
-        const { grid } = this.state;
-        const startnode = grid[this.state.START_NODE_ROW][this.state.START_NODE_COL];
-        const endnode = grid[this.state.END_NODE_ROW][this.state.END_NODE_COL];
-        const visitedNodes = Astar(grid, startnode, endnode, this.diagonalPathing);
-
-        const path = this.shortestPathFromEnd(startnode, endnode);
-        await this.colorVisited(visitedNodes);
-        await this.colorPath(path);
-    }
-
-    helperDikjstras = async () => {
-        await this.resetCss();
-        await this.resetPath();
-        const { grid } = this.state;
-        const startnode = grid[this.state.START_NODE_ROW][this.state.START_NODE_COL];
-        const endnode = grid[this.state.END_NODE_ROW][this.state.END_NODE_COL];
-        const visitedNodes = Dikjstras(grid, startnode, endnode);
-        const path = this.shortestPathFromEnd(startnode, endnode);
-
-        await this.colorVisited(visitedNodes);
-        await this.colorPath(path);
-    }
 
     colorVisited = async (visitedNodes) => {
         for (let i = 0; i < visitedNodes.length; i++) {
@@ -213,8 +149,9 @@ export default class PathfindingVisualizer extends React.Component {
         return path;
     }
 
+    // Changes grid, find better complexity
     getNewGridWithWallToggled(grid, row, col) {
-        const newGrid = grid.slice();
+        const newGrid = grid.slice();      // bad slicing every time mouse goes in new node
         const node = newGrid[row][col];
         const newNode = {
             ...node,
@@ -224,14 +161,6 @@ export default class PathfindingVisualizer extends React.Component {
         return newGrid;
     };
 
-
-    toggleDiagonal() {
-        this.diagonalPathing = !this.diagonalPathing;
-        // let but = document.getElementById("togglebutton");
-        // but.classList.toggleClass("foo");
-
-        console.log(this.diagonalPathing);
-    }
 
     // return array of unvisited neighbors of node
     // does not include diagonal
@@ -277,6 +206,35 @@ export default class PathfindingVisualizer extends React.Component {
         return neighbors;
     }
 
+    mapGrid() {
+        const { grid } = this.state;
+        return grid.map((row, rowId) => {
+            return (
+                <div key={rowId}>
+                    {row.map((node, nodeId) => {
+                        let { startnode, endnode, isWall, } = node;
+                        return <Node
+                            key={nodeId}
+                            row={rowId}
+                            col={nodeId}
+                            startnode={startnode}
+                            endnode={endnode}
+                            // distance={distance}
+                            // isVisited={isVisited}
+                            isWall={isWall}
+                            // previousNode={previousNode}  
+                            // onMouseDown={(row, col) => this.mouseStrat2.handleMouseDown(row, col)}
+                            onMouseDown={(row, col) => this.mouseStrat2.handleMouseDown(row, col)}
+                            onMouseEnter={(row, col) => this.mouseStrat2.handleMouseEnter(row, col)}
+                            onMouseUp={(row, col) => this.mouseStrat2.handleMouseUp(row, col)}
+
+                        ></Node>
+                    })}
+                </div>
+            )
+        })
+    }
+
     render() {
         // const { grid } = this.state;
         return (
@@ -284,11 +242,13 @@ export default class PathfindingVisualizer extends React.Component {
                 <div className="button-bar">
                     <a href="http://patgiok.azurewebsites.net/"><button>Home</button></a>
                     {/* <button onClick={() => console.log(this.state.grid)}> check grid</button> */}
-                    <button onClick={() => this.resetGrid()}>reset grid</button>
+                    <button onClick={() => this.resetCss()}>reset path</button>
+                    {/* <button onClick={() => this.resetGrid()}>reset grid</button> */}
                     <button onClick={() => this.resetWall()}>reset walls</button>
                     <button onClick={() => this.GreedyBestFirstHelper()}>BestFirst</button>
                     <button onClick={() => this.helperAstar()}>Astar</button>
                     <button onClick={() => this.helperDikjstras()}>Dikjstras</button>
+                    <button onClick={() => this.helperBFS()}>BFS</button>
                     <button id="togglebutton" onClick={() => this.toggleDiagonal()}>diagonals</button>
                     {/* <button onClick={() => this.mouseStrat2 = new StartEndStrat(this)}>startendstrat</button>
                     <button onClick={() => this.mouseStrat2 = new WallStrat(this)}>wallstrat</button> */}
@@ -298,6 +258,68 @@ export default class PathfindingVisualizer extends React.Component {
                 </div>
             </React.Fragment>
         );
+    }
+    toggleDiagonal() {
+        this.diagonalPathing = !this.diagonalPathing;
+        var but = document.getElementById("togglebutton");
+        if (this.diagonalPathing) {
+            but.style.backgroundColor = "#F22EFC";
+        } else {
+            but.style.backgroundColor = "#222570";
+        }
+        console.log(`diagonal pathing: ${this.diagonalPathing}`);
+    }
+
+    GreedyBestFirstHelper = async () => {
+        await this.resetCss();
+        await this.resetPath();
+        const { grid } = this.state;
+        const startnode = grid[this.state.START_NODE_ROW][this.state.START_NODE_COL];
+        const endnode = grid[this.state.END_NODE_ROW][this.state.END_NODE_COL];
+        const visitedNodes = GreedyBestFirst(grid, startnode, endnode, this.diagonalPathing);
+
+        const path = this.shortestPathFromEnd(startnode, endnode);
+        await this.colorVisited(visitedNodes);
+        await this.colorPath(path);
+    }
+
+    helperAstar = async () => {
+        await this.resetCss();
+        await this.resetPath();
+        const { grid } = this.state;
+        const startnode = grid[this.state.START_NODE_ROW][this.state.START_NODE_COL];
+        const endnode = grid[this.state.END_NODE_ROW][this.state.END_NODE_COL];
+        const visitedNodes = Astar(grid, startnode, endnode, this.diagonalPathing);
+
+        const path = this.shortestPathFromEnd(startnode, endnode);
+        await this.colorVisited(visitedNodes);
+        await this.colorPath(path);
+    }
+
+    helperDikjstras = async () => {
+        await this.resetCss();
+        await this.resetPath();
+        const { grid } = this.state;
+        const startnode = grid[this.state.START_NODE_ROW][this.state.START_NODE_COL];
+        const endnode = grid[this.state.END_NODE_ROW][this.state.END_NODE_COL];
+        const visitedNodes = Dikjstras(grid, startnode, endnode);
+        const path = this.shortestPathFromEnd(startnode, endnode);
+
+        await this.colorVisited(visitedNodes);
+        await this.colorPath(path);
+    }
+
+    helperBFS = async () => {
+        await this.resetCss();
+        await this.resetPath();
+        const { grid } = this.state;
+        const startnode = grid[this.state.START_NODE_ROW][this.state.START_NODE_COL];
+        const endnode = grid[this.state.END_NODE_ROW][this.state.END_NODE_COL];
+        const visitedNodes = BFS(grid, startnode, this.diagonalPathing);
+        const path = this.shortestPathFromEnd(startnode, endnode);
+
+        await this.colorVisited(visitedNodes);
+        await this.colorPath(path);
     }
 }
 
@@ -311,19 +333,6 @@ export function getAllNodes(grid) {
     }
     return nodes;
 }
-
-// sorts input array of nodes by their distance
-export function sortNodesByDistance(unvisitedNodes) {
-    unvisitedNodes.sort((nodeA, nodeB) => nodeA.distance - nodeB.distance);
-}
-
-// if both distance equal, first condition is 0 and considered false, then second part of condition is executed.
-export function sortNodesByDistanceThenHcost(unvisitedNodes) {
-    unvisitedNodes.sort(function (nodeA, nodeB) {
-        return nodeA.distance - nodeB.distance || nodeA.Hcost - nodeB.Hcost
-    })
-}
-
 
 // takes too long, has to check every node
 // export function getUnvisitedNeighbors3(nodes, currentNode) {
