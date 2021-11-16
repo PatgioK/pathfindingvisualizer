@@ -242,14 +242,14 @@ export default class PathfindingVisualizer extends React.Component {
                 <div className="button-bar">
                     <a href="http://patgiok.azurewebsites.net/"><button>Home</button></a>
                     {/* <button onClick={() => console.log(this.state.grid)}> check grid</button> */}
-                    <button onClick={() => this.resetCss()}>reset path</button>
+                    <button onClick={() => this.resetCss()}>Reset Path</button>
                     {/* <button onClick={() => this.resetGrid()}>reset grid</button> */}
-                    <button onClick={() => this.resetWall()}>reset walls</button>
-                    <button onClick={() => this.GreedyBestFirstHelper()}>BestFirst</button>
-                    <button onClick={() => this.helperAstar()}>Astar</button>
+                    <button onClick={() => this.resetWall()}>Reset Walls</button>
                     <button onClick={() => this.helperDikjstras()}>Dikjstras</button>
-                    <button onClick={() => this.helperBFS()}>BFS</button>
-                    <button id="togglebutton" onClick={() => this.toggleDiagonal()}>diagonals</button>
+                    <button onClick={() => this.helperAstar()}>A*</button>
+                    <button onClick={() => this.GreedyBestFirstHelper()}>Best First</button>
+                    <button onClick={() => this.helperBFS()}>Breadth First</button>
+                    <button id="togglebutton" onClick={() => this.toggleDiagonal()}>Allow Diagonal</button>
                     {/* <button onClick={() => this.mouseStrat2 = new StartEndStrat(this)}>startendstrat</button>
                     <button onClick={() => this.mouseStrat2 = new WallStrat(this)}>wallstrat</button> */}
                 </div>
@@ -263,7 +263,7 @@ export default class PathfindingVisualizer extends React.Component {
         this.diagonalPathing = !this.diagonalPathing;
         var but = document.getElementById("togglebutton");
         if (this.diagonalPathing) {
-            but.style.backgroundColor = "#F22EFC";
+            but.style.backgroundColor = "#2d73ff";
         } else {
             but.style.backgroundColor = "#222570";
         }

@@ -16,16 +16,39 @@ body{
 
 .button-bar button {
     background-color:#002570;
-    border: 1px solid White;
+    border: 0px solid White;
     color: white; /* White text */
     font-weight: bold;
     padding: 10px 24px; 
     cursor: pointer; /* Pointer/hand icon */
     float: left; /* Float the buttons side by side */
-    width: 14.28%;
+    width: 12.5%;
   }
 
   button:hover{
-    background-color: #FFFEFC !important;
-    color: #9ED1E0;
+    /* background-color: #FFFEFC; */
+    /* color: #9ED1E0; */
+
+    
+    animation-name: buttonHover;
+    animation-duration: 0.3s;
+    animation-timing-function: linear;
+    animation-delay: 0;
+    animation-direction: alternate;
+    animation-iteration-count: 1;
+    animation-fill-mode: forwards;
+    animation-play-state: running;
+  }
+
+  @keyframes buttonHover {
+    
+    0% {
+      color: #FFFEFC;
+      /* border-radius: 100%; */
+    }
+  
+  
+    100% {
+      color: rgb(62, 139, 255);
+    }
   }

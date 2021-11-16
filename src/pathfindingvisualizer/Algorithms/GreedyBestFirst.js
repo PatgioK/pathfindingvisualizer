@@ -1,6 +1,7 @@
 import { getAllNodes } from "../PathfindingVisualizer";
 import { Manhattan, Octile, } from "../Heuristics";
 
+
 export function GreedyBestFirst(grid, startNode, endNode, diagonalPathing) {
     const visitedNodes = [];
     const unvisitedNodes = getAllNodes(grid);
