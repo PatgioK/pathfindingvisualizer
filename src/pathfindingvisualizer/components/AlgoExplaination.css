@@ -1,0 +1,11 @@
+
+.algoExp{
+    color:white;
+
+  }
+  .algoExpName{
+      color:rgb(255, 255, 255);
+    font-size: 22;
+    /* text-shadow: 1px 1px rgb(255, 255, 255); */
+    font-weight: bold;
+  }

@@ -1,13 +1,14 @@
 .grid-container{
-    height: 94vh; /* Magic here */
+    /*height: 94vh; /* Magic here */
     display: inline-block;
     font-size: 0;
-    margin: 103px 0 0;
+    margin: 103px 0px 0px;
     white-space : nowrap; /* prevents divs from stacking if they dont fit on screen */
 }
 body{
   background-color: #777;
 }
+
 .button-bar {
   /* background-color:#002570; */
   border-width: 0px; 
@@ -23,6 +24,7 @@ body{
     cursor: pointer; /* Pointer/hand icon */
     float: left; /* Float the buttons side by side */
     width: 12.5%;
+    white-space : nowrap;
   }
 
   button:hover{

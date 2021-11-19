@@ -8,6 +8,7 @@ import { Dikjstras } from "./Algorithms/Dikjstras";
 import { Astar } from "./Algorithms/Astar"
 import { GreedyBestFirst } from "./Algorithms/GreedyBestFirst"
 import { BFS } from "./Algorithms/BFS"
+import AlgoExplaination from "./components/AlgoExplaination"
 
 const ANIMATION_SPEED = 100;
 
@@ -30,6 +31,7 @@ export default class PathfindingVisualizer extends React.Component {
             START_NODE_COL: 7,
             END_NODE_ROW: 10,
             END_NODE_COL: 30,
+            AlgoDef: null,
         };
         const diagonalPathing = false;
         const mouseStrat2 = null;
@@ -39,6 +41,7 @@ export default class PathfindingVisualizer extends React.Component {
         this.resetGrid();
         this.mouseStrat2 = new GeneralStrat();
         this.diagonalPathing = false;
+        this.AlgoDef = null;
     }
 
     createNode(row, col) {
@@ -237,30 +240,62 @@ export default class PathfindingVisualizer extends React.Component {
 
     render() {
         // const { grid } = this.state;
+        // React.Fragment lets me return multiple non nested divs
         return (
             <React.Fragment>
                 <div className="button-bar">
-                    <a href="http://patgiok.azurewebsites.net/"><button>Home</button></a>
+                    <a href="http://patgiok.azurewebsites.net/"><button
+                        onMouseOver={() => this.setState({ AlgoDef: "Home" })}
+                        >Home</button></a>
                     {/* <button onClick={() => console.log(this.state.grid)}> check grid</button> */}
-                    <button onClick={() => this.resetCss()}>Reset Path</button>
+                    {/* <button onClick={() => console.log(this.state.AlgoDef)}> check state</button> */}
+                    <button onClick={() => this.resetCss()}
+                        onMouseOver={() => this.setState({ AlgoDef: "path" })}
+                    >Reset Path</button>
                     {/* <button onClick={() => this.resetGrid()}>reset grid</button> */}
-                    <button onClick={() => this.resetWall()}>Reset Walls</button>
-                    <button onClick={() => this.helperDikjstras()}>Dikjstras</button>
-                    <button onClick={() => this.helperAstar()}>A*</button>
-                    <button onClick={() => this.GreedyBestFirstHelper()}>Best First</button>
-                    <button onClick={() => this.helperBFS()}>Breadth First</button>
-                    <button id="togglebutton" onClick={() => this.toggleDiagonal()}>Allow Diagonal</button>
+                    <button onClick={() => this.resetWall()}
+                        onMouseOver={() => this.setState({ AlgoDef: "path" })}
+                    >Reset Walls</button>
+
+                    <button
+                        onClick={() => this.helperDikjstras()}
+                        onMouseOver={() => this.setState({ AlgoDef: "Dikj" })}
+                    >Dikjstra</button>
+
+                    <button
+                        onClick={() => this.helperAstar()}
+                        onMouseOver={() => this.setState({ AlgoDef: "Astar" })}
+                    >A*</button>
+
+                    <button
+                        onClick={() => this.GreedyBestFirstHelper()}
+                        onMouseOver={() => this.setState({ AlgoDef: "BestFirst" })}
+                    >Best First</button>
+
+                    <button
+                        onClick={() => this.helperBFS()}
+                        onMouseOver={() => this.setState({ AlgoDef: "BFS" })}
+                    >Breadth First</button>
+
+                    <button id="togglebutton"
+                        onClick={() => this.toggleDiagonal()}
+                        onMouseOver={() => this.setState({ AlgoDef: "diag" })}
+                    >Allow Diagonal</button>
                     {/* <button onClick={() => this.mouseStrat2 = new StartEndStrat(this)}>startendstrat</button>
                     <button onClick={() => this.mouseStrat2 = new WallStrat(this)}>wallstrat</button> */}
                 </div>
                 <div className="grid-container">
                     {this.mapGrid()}
                 </div>
+                <div>
+                    <AlgoExplaination algoName={this.state.AlgoDef} />
+                </div>
             </React.Fragment>
         );
     }
     toggleDiagonal() {
         this.diagonalPathing = !this.diagonalPathing;
+        let d = "diag"
         var but = document.getElementById("togglebutton");
         if (this.diagonalPathing) {
             but.style.backgroundColor = "#2d73ff";
